@@ -33,6 +33,13 @@ int main() {
     fullscreenTriangle[2].texCoords = {0, 2};
     // load vertex and fragment shaders:
     sf::Shader shader(std::filesystem::path{"main.vert"}, std::filesystem::path{"main.frag"});
+
+    // set uniforms for problem 1 (read from line 21 for dimensions)
+    // NOTE: IDK why these are brought up, gl_FragColor just needs to be set to the interpolated texture coordinates
+    // shader.setUniform("g_windowWidth", 1280);
+    // shader.setUniform("g_windowHeight", 720);
+
+
     // TODO: eventually add another Shader here which uses the blur fragment shader,
     // also create a sf::RenderTexture...
     while (window.isOpen()) {
