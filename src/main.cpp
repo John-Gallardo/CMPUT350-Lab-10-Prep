@@ -34,12 +34,6 @@ int main() {
     // load vertex and fragment shaders:
     sf::Shader shader(std::filesystem::path{"main.vert"}, std::filesystem::path{"main.frag"});
 
-    // set uniforms for problem 1 (read from line 21 for dimensions)
-    // NOTE: IDK why these are brought up, gl_FragColor just needs to be set to the interpolated texture coordinates
-    // shader.setUniform("g_windowWidth", 1280);
-    // shader.setUniform("g_windowHeight", 720);
-
-
     // TODO: eventually add another Shader here which uses the blur fragment shader,
     // also create a sf::RenderTexture...
     while (window.isOpen()) {
@@ -49,6 +43,15 @@ int main() {
             }
         }
         // TODO: set shader uniforms and eventually draw into
+        // set uniforms for problem 1 (read from line 21 for dimensions)
+        shader.setUniform("g_windowWidth", 1280);
+        shader.setUniform("g_windowHeight", 720);
+
+        // grab mouse position in SFML's window coordinates for problem 2 & set corresponding uniform
+        sf::Vector2f mousePos{sf::Mouse::getPosition(window)};
+        std::cout << mousePos.x << ' ' << mousePos.y << '\n';
+        shader.setUniform("g_mousePos", mousePos);
+
         // a RenderTexture first before postprocessing into the window target.
         window.clear(sf::Color::Black);
         window.draw(fullscreenTriangle, &shader);
