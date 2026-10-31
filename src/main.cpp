@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
+#include <chrono>
 
 int main() {
     // OpenGL settings we request for:
@@ -36,6 +37,9 @@ int main() {
 
     // TODO: eventually add another Shader here which uses the blur fragment shader,
     // also create a sf::RenderTexture...
+
+    // reference for chrono code: lab 4
+    std::chrono::time_point<std::chrono::steady_clock> time{};  // reference time
     while (window.isOpen()) {
         while (auto e = window.pollEvent()) {
             if (e->is<sf::Event::Closed>()) {
@@ -49,8 +53,12 @@ int main() {
 
         // grab mouse position in SFML's window coordinates for problem 2 & set corresponding uniform
         sf::Vector2f mousePos{sf::Mouse::getPosition(window)};
-        std::cout << mousePos.x << ' ' << mousePos.y << '\n';
         shader.setUniform("g_mousePos", mousePos);
+
+        // grab time elapsed in seconds for problem 3 & set uniform
+        auto timeNow{std::chrono::steady_clock::now()};
+        int timeElapsed{static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - time).count())};
+        shader.setUniform("g_timeElapsed", timeElapsed);
 
         // a RenderTexture first before postprocessing into the window target.
         window.clear(sf::Color::Black);

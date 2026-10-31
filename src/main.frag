@@ -4,12 +4,18 @@
 uniform int g_windowWidth;
 uniform int g_windowHeight;
 uniform vec2 g_mousePos;  // NOTE: this is in SFML's window coordinate system!!! i.e +y is down
+uniform int g_timeElapsed;  // in milliseconds
 
 void main(void) {
     // Fragment shader should output into gl_FragColor an RGBA:
+
+    // Problem 3: use modulo to go through a gradient for red and green
+    float red = mod(gl_TexCoord[0].x * g_timeElapsed / 1000.0f, gl_TexCoord[0].x);
+    float green = mod(gl_TexCoord[0].y * g_timeElapsed / 1000.0f, gl_TexCoord[0].y);
+
     // NOTE: I am assuming that the texture coordinates are supposed to be the RGB values since the values make sense.
     // I don't know why color wasn't set instead?
-    gl_FragColor = vec4(gl_TexCoord[0].xy, 0, 1);  // NOTE: blue is 0, alpha is always 1. use interpolated RG values
+    gl_FragColor = vec4(red, green, 0, 1);  // NOTE: blue is 0, alpha is always 1. use interpolated RG values
 
     // Problem 2: if we are within 10 pixels of the mouse position, draw a circle instead
     // 1. grab vector from center of screen in window coordinates to mouse pos in SFML coordinates
