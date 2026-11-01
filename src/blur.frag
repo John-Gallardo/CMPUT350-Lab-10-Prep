@@ -20,7 +20,7 @@ void main() {
     for (int i = texCoordScreenInt.x - 2; i <= texCoordScreenInt.x + 2; i++) {
         for (int j = texCoordScreenInt.y - 2; j <= texCoordScreenInt.y + 2; j++) {
             // convert back to texture coordinate space & add color to textureColor
-            vec2 currTexCoord = vec2(i / g_windowWidth, j / g_windowHeight);
+            vec2 currTexCoord = vec2(float(i) / g_windowWidth, float(j) / g_windowHeight);
             vec4 currTextureColor = texture2D(g_texture, currTexCoord);
             textureColor += currTextureColor;
         }
