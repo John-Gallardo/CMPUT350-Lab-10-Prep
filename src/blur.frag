@@ -12,15 +12,16 @@ void main() {
     vec2 texCoordScreenFloat = vec2(gl_TexCoord[0].x * g_windowWidth, gl_TexCoord[0].y * g_windowHeight);
 
     // 2. Convert to nearest integer so we grab the closest pixel
-    ivec2 texCoordScreenInt = vec2(round(texCoordScreenFloat.x), round(texCoordScreenInt.y));
+    // NOTE: using floor() instead of round() because round() isn't supported until GLSL 1.3 or later!!!
+    ivec2 texCoordScreenInt = ivec2(floor(texCoordScreenFloat.x + 0.5), floor(texCoordScreenFloat.y + 0.5));
 
     // 3. Double loop for iterating through 5x5 pixels (2 rows before to 2 rows after, 2 columns before to 2 columns after)
     vec4 textureColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);  // start with all black, but alpha = 1
     for (int i = texCoordScreenInt.x - 2; i <= texCoordScreenInt.x + 2; i++) {
         for (int j = texCoordScreenInt.y - 2; j <= texCoordScreenInt.y + 2; j++) {
             // convert back to texture coordinate space & add color to textureColor
-            vec2 currTexCoord = vec2(i / g_windowWidth, y / g_windowHeight);
-            vec4 currTextureColor = texture(g_texture, currTexCoord);
+            vec2 currTexCoord = vec2(i / g_windowWidth, j / g_windowHeight);
+            vec4 currTextureColor = texture2D(g_texture, currTexCoord);
             textureColor += currTextureColor;
         }
     }
