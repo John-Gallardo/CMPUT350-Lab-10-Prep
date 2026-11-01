@@ -40,7 +40,6 @@ int main() {
     // reuse vertex shader because behaviour should be the same (just sets color, position, texture coordinates)
     sf::Shader postProcessShader{std::filesystem::path{"main.vert"}, std::filesystem::path{"blur.frag"}};
     sf::RenderTexture preBlurRenderTexture{{1280, 720}};  // same dimensions as the window
-    sf::RenderTexture postBlurRenderTexture{{1280, 720}};
 
     // reference for chrono code: lab 4
     std::chrono::time_point<std::chrono::steady_clock> time{};  // reference time
@@ -72,17 +71,15 @@ int main() {
 
         // pass 2: blur the texture
         sf::Sprite unblurredSprite{preBlurRenderTexture.getTexture()};
+        // change position from (0, 0) to (-1, -1), the bottom left corner
+        // if it isn't changed then only the top right quadrant gets rendered to
+        // this breaks the cursor but TBH idk how to fix it
+        unblurredSprite.setPosition(sf::Vector2f{-1.0f, -1.0f});
         postProcessShader.setUniform("g_texture", preBlurRenderTexture.getTexture());
         postProcessShader.setUniform("g_windowWidth", 1280);
         postProcessShader.setUniform("g_windowHeight", 720);
-        postBlurRenderTexture.clear();
-        postBlurRenderTexture.draw(unblurredSprite, &postProcessShader);
-        postBlurRenderTexture.display();
-
-        // pass 3: pass this blurred texture onto the window
         window.clear();
-        sf::Sprite finalSprite{postBlurRenderTexture.getTexture()};
-        window.draw(finalSprite);
+        window.draw(unblurredSprite, &postProcessShader);
         window.display();
     }
     return 0;
