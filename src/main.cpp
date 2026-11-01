@@ -39,7 +39,8 @@ int main() {
     // also create a sf::RenderTexture...
     // reuse vertex shader because behaviour should be the same (just sets color, position, texture coordinates)
     sf::Shader postProcessShader{std::filesystem::path{"main.vert"}, std::filesystem::path{"blur.frag"}};
-    sf::RenderTexture renderTexture{{1280, 720}};  // same dimensions as the window
+    sf::RenderTexture preBlurRenderTexture{{1280, 720}};  // same dimensions as the window
+    sf::RenderTexture postBlurRenderTexture{{1280, 720}};
 
     // reference for chrono code: lab 4
     std::chrono::time_point<std::chrono::steady_clock> time{};  // reference time
@@ -65,19 +66,22 @@ int main() {
 
         // a RenderTexture first before postprocessing into the window target.
         // pass 1: draw onto texture with our normal shader
-        renderTexture.clear(sf::Color::Black);
-        renderTexture.draw(fullscreenTriangle, &shader);
-        renderTexture.display();
+        preBlurRenderTexture.clear(sf::Color::Black);
+        preBlurRenderTexture.draw(fullscreenTriangle, &shader);
+        preBlurRenderTexture.display();
 
         // pass 2: blur the texture
-        sf::Sprite unblurredSprite{renderTexture.getTexture()};
-        renderTexture.clear();
-        renderTexture.draw(unblurredSprite, &postProcessShader);
-        renderTexture.display();
+        sf::Sprite unblurredSprite{preBlurRenderTexture.getTexture()};
+        postProcessShader.setUniform("g_texture", preBlurRenderTexture.getTexture());
+        postProcessShader.setUniform("g_windowWidth", 1280);
+        postProcessShader.setUniform("g_windowHeight", 720);
+        postBlurRenderTexture.clear();
+        postBlurRenderTexture.draw(unblurredSprite, &postProcessShader);
+        postBlurRenderTexture.display();
 
         // pass 3: pass this blurred texture onto the window
         window.clear();
-        sf::Sprite finalSprite{renderTexture.getTexture()};
+        sf::Sprite finalSprite{postBlurRenderTexture.getTexture()};
         window.draw(finalSprite);
         window.display();
     }
