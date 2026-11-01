@@ -37,6 +37,9 @@ int main() {
 
     // TODO: eventually add another Shader here which uses the blur fragment shader,
     // also create a sf::RenderTexture...
+    // reuse vertex shader because behaviour should be the same (just sets color, position, texture coordinates)
+    sf::Shader postProcessShader{std::filesystem::path{"main.vert"}, std::filesystem::path{"blur.frag"}};
+    sf::RenderTexture renderTexture{{1280, 720}};  // same dimensions as the window
 
     // reference for chrono code: lab 4
     std::chrono::time_point<std::chrono::steady_clock> time{};  // reference time
@@ -61,8 +64,21 @@ int main() {
         shader.setUniform("g_timeElapsed", timeElapsed);
 
         // a RenderTexture first before postprocessing into the window target.
-        window.clear(sf::Color::Black);
-        window.draw(fullscreenTriangle, &shader);
+        // pass 1: draw onto texture with our normal shader
+        renderTexture.clear(sf::Color::Black);
+        renderTexture.draw(fullscreenTriangle, &shader);
+        renderTexture.display();
+
+        // pass 2: blur the texture
+        sf::Sprite unblurredSprite{renderTexture.getTexture()};
+        renderTexture.clear();
+        renderTexture.draw(unblurredSprite, &postProcessShader);
+        renderTexture.display();
+
+        // pass 3: pass this blurred texture onto the window
+        window.clear();
+        sf::Sprite finalSprite{renderTexture.getTexture()};
+        window.draw(finalSprite);
         window.display();
     }
     return 0;
